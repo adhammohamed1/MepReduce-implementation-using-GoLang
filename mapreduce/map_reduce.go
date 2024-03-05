@@ -33,7 +33,7 @@ func runMapTask(
 		if err != nil {
 			panic(err)
 		}
-		intermediateFile.Close()
+		defer intermediateFile.Close()
 	}
 
 	// Writing the key-value pairs to the intermediate files
@@ -53,7 +53,7 @@ func runMapTask(
 		if err != nil {
 			panic(err)
 		}
-		intermediateFile.Close()
+		defer intermediateFile.Close()
 	}
 
 }
@@ -81,6 +81,7 @@ func runReduceTask(
 		if err != nil {
 			panic(err)
 		}
+		defer intermediateFile.Close()
 
 		// Reading intermediate files and grouping the received key-value pairs by key
 		decoder := json.NewDecoder(intermediateFile)
@@ -93,7 +94,6 @@ func runReduceTask(
 			intermediateKeyValuePairs[kv.Key] = append(intermediateKeyValuePairs[kv.Key], kv.Value)
 		}
 
-		intermediateFile.Close()
 	}
 
 	// Sorting the keys (required in the assignment)
@@ -109,9 +109,10 @@ func runReduceTask(
 	if err != nil {
 		panic(err)
 	}
-	encoder := json.NewEncoder(outputFile)
+	defer outputFile.Close()
 
 	// Processing the key-value pairs in sorted order
+	encoder := json.NewEncoder(outputFile)
 	for _, key := range sortedKeys {
 		values := intermediateKeyValuePairs[key]
 
@@ -124,7 +125,5 @@ func runReduceTask(
 			panic(err)
 		}
 	}
-
-	outputFile.Close()
 
 }
