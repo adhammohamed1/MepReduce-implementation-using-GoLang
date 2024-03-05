@@ -4,16 +4,35 @@ import (
 	"fmt"
 	"mapreduce"
 	"os"
+	"strconv"
+	"strings"
 )
 
-func mapFn(docName string, value string) ([]mapreduce.KeyValue) {
-	// TODO: write this function -- See description in assignment
+func mapFn(docName string, value string) []mapreduce.KeyValue {
+	keyValuePairs := []mapreduce.KeyValue{}
+	tokens := strings.Fields(value)
 
+	for _, token := range tokens {
+		if len(token) >= 8 {
+			keyValuePairs = append(keyValuePairs, mapreduce.KeyValue{Key: token, Value: "1"})
+		}
+	}
+
+	return keyValuePairs
 }
 
-
 func reduceFn(key string, values []string) string {
-	// TODO: write this function -- See description in assignment
+	total := 0
+	for i := 0; i < len(values); i++ {
+		value, err := strconv.Atoi(values[i])
+		if err != nil {
+			panic(err)
+		}
+		total += value
+	}
+	value_str := strconv.Itoa(total)
+
+	return value_str
 }
 
 // Can be run in 3 ways:
